@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    },
+    // Các tùy chọn khác...
+    "jsx": "react-jsx", // Đảm bảo JSX được bật
+    "moduleResolution": "node", // Hỗ trợ cách thức import module
+    "strict": true // Khuyến nghị bật chế độ kiểm tra nghiêm ngặt
+  }
+}
