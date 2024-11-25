@@ -1,4 +1,4 @@
-import React, { Fragment, useState } from "react";
+import React, { Fragment, useState, useEffect } from "react";
 import { Button } from "../../components/ui/button";
 import {
   Sheet,
@@ -8,21 +8,126 @@ import {
 } from "../../components/ui/sheet";
 import { Label } from "../../components/ui/label";
 import { Input } from "../../components/ui/input";
-import { Textarea } from "../../components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "../../components/ui/select";
-import ImageUpload from "../../components/admin-view/image-upload";
-import CardProduct from "./card-product";
 
 const AdminProducts = () => {
   const [openCreateProductDialog, setOpenCreateProductDialog] = useState(false);
+  const [categories, setCategories] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [price, setPrice] = useState("");
+  const [productName, setProductName] = useState("");
+  const [description, setDescription] = useState("");
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await fetch("http://localhost:3000/api/v1/category");
+        const data = await response.json();
+        setCategories(data.data || []);
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+      }
+    };
+    fetchCategories();
+  }, []);
+
+  const handleFileChange = (event) => {
+    setSelectedFile(event.target.files[0]);
+  };
+
+  const handlePriceChange = (event) => {
+    const value = event.target.value;
+    if (!isNaN(value) && value >= 0) {
+      setPrice(Number(value))
+    }
+  };
+
+  const uploadImage = async (file) => {
+    const accessToken = localStorage.getItem("accessToken");
+    if (!accessToken) {
+      console.error("No access token found.");
+      return null;
+    }
+
+    const formData = new FormData();
+    formData.append("image", file);
+
+    try {
+      const response = await fetch(
+        "http://localhost:3000/api/v1/product/upload-image",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+          body: formData,
+        }
+      );
+
+      const data = await response.json();
+      if (response.ok) {
+        return data.data;
+      } else {
+        console.error("Error uploading image:", data.message);
+      }
+    } catch (err) {
+      console.error("An error occurred while uploading the image:", err);
+    }
+    return null;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!productName || !description || !selectedCategory || !selectedFile || !price) {
+      console.error("Please fill in all fields.");
+      return;
+    }
+
+    const imageUrl = await uploadImage(selectedFile);
+    if (!imageUrl) {
+      console.error("Image upload failed.");
+      return;
+    }
+
+    const productData = {
+      name: productName,
+      category: selectedCategory,
+      description,
+      img: imageUrl,
+      price:Number(price)
+    };
+
+    const accessToken = localStorage.getItem("accessToken");
+
+    try {
+      const response = await fetch("http://localhost:3000/api/v1/product", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify(productData),
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        console.log("Product created successfully:", data);
+        setOpenCreateProductDialog(false); // Đóng dialog sau khi thêm thành công
+        // Reset form
+        setProductName("");
+        setDescription("");
+        setSelectedCategory("");
+        setSelectedFile(null);
+        setPrice("");
+      } else {
+        console.error("Error creating product:", data.message);
+      }
+    } catch (err) {
+      console.error("An error occurred while creating the product:", err);
+    }
+  };
+
   return (
     <Fragment>
       <div className="mb-5 w-full flex justify-end">
@@ -31,69 +136,75 @@ const AdminProducts = () => {
         </Button>
       </div>
       <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-4">
-        <div>
-          <CardProduct />
-        </div>
         <Sheet
           open={openCreateProductDialog}
-          onOpenChange={() => {
-            setOpenCreateProductDialog(false);
-          }}
+          onOpenChange={setOpenCreateProductDialog}
         >
           <SheetContent side="right" className="overflow-auto">
             <SheetHeader>
               <SheetTitle>Add new Product</SheetTitle>
             </SheetHeader>
             <div className="py-6">
-              <form className="flex flex-col gap-2">
+              <form onSubmit={handleSubmit}>
                 <div>
-                  <Label htmlFor="name">Name product</Label>
-                  <Input placeholder="Enter name product" />
-                </div>
-                <div>
-                  <Label htmlFor="price">Price</Label>
-                  <Input placeholder="Enter price product" />
+                  <Label htmlFor="name">Name</Label>
+                  <Input
+                    placeholder="Enter your product name"
+                    value={productName}
+                    onChange={(e) => setProductName(e.target.value)}
+                  />
                 </div>
                 <div>
                   <Label htmlFor="description">Description</Label>
-                  <Textarea placeholder="Enter description product" rows={7} />
-                </div>
-                <div>
-                  <Label htmlFor="quantity">Quantity</Label>
-                  <Input placeholder="Enter quantity product" />
-                </div>
-                <div>
-                  <Label htmlFor="slaes">Sales</Label>
-                  <Input placeholder="Enter product sales" />
+                  <Input
+                    placeholder="Enter your product description"
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                  />
                 </div>
                 <div>
                   <Label htmlFor="category">Category</Label>
-                  <Select>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select a fruit" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectGroup>
-                        <SelectLabel>Fruits</SelectLabel>
-                        <SelectItem value="apple">Apple</SelectItem>
-                        <SelectItem value="banana">Banana</SelectItem>
-                        <SelectItem value="blueberry">Blueberry</SelectItem>
-                        <SelectItem value="grapes">Grapes</SelectItem>
-                        <SelectItem value="pineapple">Pineapple</SelectItem>
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
+                  <select
+                    id="category"
+                    value={selectedCategory}
+                    onChange={(e) => setSelectedCategory(e.target.value)}
+                    className="w-full border p-2 rounded"
+                  >
+                    <option value="">Select a category</option>
+                    {categories.map((category) => (
+                      <option key={category._id} value={category.name}>
+                        {category.name}
+                      </option>
+                    ))}
+                  </select>
                 </div>
                 <div>
-                  <ImageUpload />
+                  <Label htmlFor="price">Price</Label>
+                  <input
+                    type="number"
+                    id="price"
+                    value={price}
+                    onChange={handlePriceChange}
+                    placeholder="Enter your price"
+                    className="w-full border p-2 rounded"
+                    min="0"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="file">Upload File</Label>
+                  <input
+                    type="file"
+                    id="file"
+                    onChange={handleFileChange}
+                    className="w-full border p-2 rounded"
+                  />
                 </div>
                 <div className="flex items-center justify-center mt-5">
-                  <Button className="w-full">Create new products</Button>
+                  <Button type="submit">Submit</Button>
                 </div>
               </form>
             </div>
           </SheetContent>
-          ;
         </Sheet>
       </div>
     </Fragment>
