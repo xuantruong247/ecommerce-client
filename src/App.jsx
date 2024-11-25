@@ -27,7 +27,7 @@ function App() {
           path="/auth"
           element={
             // <CheckAuth isAuthenticated={isAuthenticated} user={user}>
-              <AuthLayout />
+            <AuthLayout />
             // </CheckAuth>
           }
         >
@@ -38,7 +38,7 @@ function App() {
           path="/admin"
           element={
             // <CheckAuth isAuthenticated={isAuthenticated} user={user}>
-              <AdminLayout />
+            <AdminLayout />
             // </CheckAuth>
           }
         >
@@ -51,7 +51,7 @@ function App() {
           path="/shop"
           element={
             // <CheckAuth isAuthenticated={isAuthenticated} user={user}>
-              <Shoppinglayout />
+            <Shoppinglayout />
             // </CheckAuth>
           }
         >
@@ -62,6 +62,7 @@ function App() {
         </Route>
         <Route path="*" element={<NotFound />} />
         <Route path="/unauth-page" element={<UnauthPage />} />
+        <Route path="/" element={<Shoppinglayout />} />
       </Routes>
     </div>
   );
