@@ -27,6 +27,38 @@ const ShoppingProductTitle = ({ selectedCategories }) => {
     fetchProducts();
   }, [selectedCategories]); // Gọi lại API mỗi khi selectedCategories thay đổi
 
+  // Hàm xử lý thêm vào giỏ hàng
+  const handleAddToCart = async (productId) => {
+    try {
+      // Lấy token từ localStorage
+      const token = localStorage.getItem("accessToken");
+      if (!token) {
+        alert("You need to log in first.");
+        return;
+      }
+
+      // Gọi API thêm vào giỏ hàng
+      const response = await fetch(`http://localhost:3000/api/v1/order?productID=${productId}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`, // Thêm token vào header
+        },
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        alert("Product added to cart successfully!");
+      } else {
+        console.error("Failed to add product to cart:", data.message);
+        alert("Failed to add product to cart.");
+      }
+    } catch (error) {
+      console.error("Error adding product to cart:", error);
+      alert("An error occurred. Please try again later.");
+    }
+  };
+
   return (
     <div className="w-full flex flex-wrap max-w-sm mx-auto">
       {products.map((product) => (
@@ -54,7 +86,9 @@ const ShoppingProductTitle = ({ selectedCategories }) => {
               </div>
             </CardContent>
             <CardFooter>
-              <Button className="w-full">Add to cart</Button>
+              <Button className="w-full" onClick={() => handleAddToCart(product._id)}>
+                Add to cart
+              </Button>
             </CardFooter>
           </div>
         </Card>
