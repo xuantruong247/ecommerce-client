@@ -41,7 +41,7 @@ const AuthLogin = () => {
 
         // Điều hướng dựa trên role
         if (userRole === "user") {
-          navigate("/user");
+          navigate("/");
         } else if (userRole === "admin") {
           navigate("/admin");
         } else {
