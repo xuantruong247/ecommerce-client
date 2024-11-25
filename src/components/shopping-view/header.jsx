@@ -19,10 +19,12 @@ import {
   DropdownMenuTrigger,
 } from "../../components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "../../components/ui/avatar";
+import UserCartWrapper from "./cart-wrapper";
 
 const ShoppingHeader = () => {
   const [categories, setCategories] = useState([]); // State to store categories
   const [open, setOpen] = useState(false);
+
   const users = true; // Replace this with actual user state logic
   const navigate = useNavigate();
 
@@ -70,10 +72,20 @@ const ShoppingHeader = () => {
               ))}
               {users ? (
                 <div className="flex lg:items-center lg:flex-row flex-col gap-4">
-                  <Button variant="outline" size="icon">
-                    <ShoppingCart className="w-6 h-6" />
-                    <span className="sr-only">User cart</span>
-                  </Button>
+                  <Sheet
+                    open={openCartSheet}
+                    onOpenChange={() => setOpenCartSheet(false)}
+                  >
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={() => setOpenCartSheet(true)}
+                    >
+                      <ShoppingCart className="w-6 h-6" />
+                      <span className="sr-only">User cart</span>
+                    </Button>
+                    <UserCartWrapper />
+                  </Sheet>
                   <DropdownMenu>
                     <DropdownMenuTrigger>
                       <Avatar className="bg-black">
@@ -129,10 +141,20 @@ const ShoppingHeader = () => {
         <div className="hidden lg:block">
           {users ? (
             <div className="flex lg:items-center lg:flex-row flex-col gap-4">
-              <Button variant="outline" size="icon">
-                <ShoppingCart className="w-6 h-6" />
-                <span className="sr-only">User cart</span>
-              </Button>
+              <Sheet
+                open={openCartSheet}
+                onOpenChange={() => setOpenCartSheet(false)}
+              >
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => setOpenCartSheet(true)}
+                >
+                  <ShoppingCart className="w-6 h-6" />
+                  <span className="sr-only">User cart</span>
+                </Button>
+                <UserCartWrapper />
+              </Sheet>
               <DropdownMenu>
                 <DropdownMenuTrigger>
                   <Avatar className="bg-black">
