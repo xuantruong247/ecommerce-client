@@ -28,7 +28,6 @@ const AuthLogin = () => {
 
       const data = await response.json();
       if (response.ok) {
-        console.log("Login successful:", data);
 
         // Lưu accessToken vào localStorage
         const { accessToken, refreshToken } = data.data;
@@ -41,11 +40,9 @@ const AuthLogin = () => {
 
         // Điều hướng dựa trên role
         if (userRole === "user") {
-          navigate("/user");
+          navigate("/");
         } else if (userRole === "admin") {
-          navigate("/admin");
-        } else {
-          setError("Role không hợp lệ!");
+          navigate("/admin/dashboard");
         }
       } else {
         setError(data.message || "Login failed!");
