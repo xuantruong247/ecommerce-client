@@ -10,14 +10,13 @@ import {
 } from "../ui/table";
 import { Button } from "../ui/button";
 import { Dialog } from "../ui/dialog";
-import ShoppingOrderDetail from './order-detail';
-
-const ShoppingOrders = () => {
+import AdminOderDetail from "../../pages/admin-view/order-detail";
+const AdminOrdersCpn = () => {
   const [openDetail, setOpenDetail] = useState(false);
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Order History</CardTitle>
+        <CardTitle>All Orders</CardTitle>
       </CardHeader>
       <CardContent>
         <Table>
@@ -43,7 +42,7 @@ const ShoppingOrders = () => {
                   <Button onClick={() => setOpenDetail(true)}>
                     View Details
                   </Button>
-                  <ShoppingOrderDetail setOpenDetail={setOpenDetail}/>
+                  <AdminOderpDetail />
                 </Dialog>
               </TableCell>
             </TableRow>
@@ -54,4 +53,4 @@ const ShoppingOrders = () => {
   );
 };
 
-export default ShoppingOrders;
+export default AdminOrdersCpn;

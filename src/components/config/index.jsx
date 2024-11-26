@@ -61,3 +61,26 @@ export const sortByCategory = [
     label:"Title:Z to A"
   }
 ]
+
+export const Status =[
+  {
+    id:"inProcess",
+    label:"In Process"
+  },
+  {
+    id:"inShipping",
+    label:"In Shipping"
+  },
+  {
+    id:"rejected",
+    label:"Rejected"
+  },
+  {
+    id:"accessories",
+    label:"Accessories"
+  },
+  {
+    id:"footwear",
+    label:"Footwear"
+  }
+]

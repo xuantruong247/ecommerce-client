@@ -85,7 +85,7 @@ const ShoppingHeader = () => {
                       <ShoppingCart className="w-6 h-6" />
                       <span className="sr-only">User cart</span>
                     </Button>
-                    <UserCartWrapper />
+                    <UserCartWrapper setOpenCartSheet={setOpenCartSheet}/>
                   </Sheet>
                   <DropdownMenu>
                     <DropdownMenuTrigger>

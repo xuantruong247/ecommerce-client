@@ -2,8 +2,10 @@ import React from "react";
 import { SheetContent, SheetHeader, SheetTitle } from "../ui/sheet";
 import { Button } from "../ui/button";
 import UserCartItemsContent from "./cart-item-content";
+import { useNavigate } from "react-router-dom";
 
-const UserCartWrapper = () => {
+const UserCartWrapper = ({ setOpenCartSheet }) => {
+  const navigate = useNavigate();
   return (
     <SheetContent className="sm:max-w-md">
       <SheetHeader>
@@ -18,7 +20,15 @@ const UserCartWrapper = () => {
           <span className="font-bold">30.000.000vnd</span>
         </div>
       </div>
-      <Button className="w-full mt-5">Checkout</Button>
+      <Button
+        onClick={() => {
+          navigate("/shop/checkout");
+          setOpenCartSheet(false);
+        }}
+        className="w-full mt-5"
+      >
+        Checkout
+      </Button>
     </SheetContent>
   );
 };

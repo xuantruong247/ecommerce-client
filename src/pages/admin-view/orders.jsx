@@ -1,9 +1,12 @@
-import React from 'react'
+import React from "react";
+import AdminOrdersCpn from "./../../components/admin-view/orders";
 
 const AdminOrders = () => {
   return (
-    <div>AdminOrders</div>
-  )
-}
+    <div>
+      <AdminOrdersCpn />
+    </div>
+  );
+};
 
-export default AdminOrders
+export default AdminOrders;

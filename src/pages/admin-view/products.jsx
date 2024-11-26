@@ -8,6 +8,7 @@ import {
 } from "../../components/ui/sheet";
 import { Label } from "../../components/ui/label";
 import { Input } from "../../components/ui/input";
+import AdminProductTitle from "../../components/admin-view/product-title";
 
 const AdminProducts = () => {
   const [openCreateProductDialog, setOpenCreateProductDialog] = useState(false);
@@ -135,7 +136,8 @@ const AdminProducts = () => {
           Add new product
         </Button>
       </div>
-      <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-4">
+      <div >
+        <AdminProductTitle/>
         <Sheet
           open={openCreateProductDialog}
           onOpenChange={setOpenCreateProductDialog}
