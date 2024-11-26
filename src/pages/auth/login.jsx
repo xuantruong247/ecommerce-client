@@ -40,7 +40,7 @@ const AuthLogin = () => {
 
         // Điều hướng dựa trên role
         if (userRole === "user") {
-          navigate("/");
+          navigate("/shop/home");
         } else if (userRole === "admin") {
           navigate("/admin/dashboard");
         }

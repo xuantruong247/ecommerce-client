@@ -24,6 +24,7 @@ import UserCartWrapper from "./cart-wrapper";
 const ShoppingHeader = () => {
   const [categories, setCategories] = useState([]); // State to store categories
   const [open, setOpen] = useState(false);
+  const [openCartSheet, setOpenCartSheet] = useState(false);
 
   const users = true; // Replace this with actual user state logic
   const navigate = useNavigate();
@@ -43,7 +44,6 @@ const ShoppingHeader = () => {
     };
     fetchCategories();
   }, []);
-
 
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-muted/10">
@@ -128,11 +128,14 @@ const ShoppingHeader = () => {
         </Sheet>
         <div className="hidden lg:block">
           <nav className="flex flex-col mb-3 lg:mb-0 lg:items-center gap-6 lg:flex-row">
+            <Link className="text-sm font-medium" to={"/shop/listing"}>
+              Store
+            </Link>
             {categories.map((category) => (
               <Link
                 key={category._id}
                 className="text-sm font-medium"
-                to={`/shop/category/${category._id}`}
+                to={`/shop/listing`}
               >
                 {category.name}
               </Link>
