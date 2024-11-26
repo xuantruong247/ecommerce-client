@@ -3,8 +3,9 @@ import { Card, CardContent, CardFooter } from "../ui/card";
 import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
 
-const ShoppingProductTitle = ({ product }) => {
+const ShoppingProductTitle = ({ product,productByDetail }) => {
   const { img, name, category, price, hot, _id } = product;
+
 
   // Hàm xử lý khi nhấn nút "Add to cart"
   const handleAddToCart = async () => {
@@ -40,7 +41,8 @@ const ShoppingProductTitle = ({ product }) => {
 
   return (
     <Card className="w-full max-w-sm mx-auto">
-      <div className="relative">
+      <div className="relative" onClick={()=>productByDetail(_id)}>
+        
         <img
           src={img || "https://via.placeholder.com/400"}
           alt={name || "Product"}

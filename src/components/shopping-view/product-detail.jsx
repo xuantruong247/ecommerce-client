@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Dialog, DialogContent } from "../ui/dialog";
 import { Button } from "../ui/button";
 import { Separator } from "../ui/separator";
@@ -6,49 +6,48 @@ import { Avatar, AvatarFallback } from "../ui/avatar";
 import { StarIcon } from "lucide-react";
 import { Input } from "../ui/input";
 
-const ShoppingProductDetail = ({ open, setOpen, productId }) => {
-  const [product, setProduct] = useState(null);
-  const [loading, setLoading] = useState(true);
+const ShoppingProductDetail = ({ open, setOpen, product }) => {
+  const handleAddToCart = async () => {
+    try {
+      // Lấy token từ localStorage
+      const token = localStorage.getItem("accessToken");
+      if (!token) {
+        alert("You need to log in first.");
+        return;
+      }
 
-  // Gọi API khi mở modal
-  useEffect(() => {
-    if (open) {
-      const fetchProductDetail = async () => {
-        try {
-          const response = await fetch(`http://localhost:3000/api/v1/product/${productId}`);
-          const data = await response.json();
-          
-          if (data.statusCode === 200) {
-            setProduct(data.data); // Lưu thông tin sản phẩm vào state
-          } else {
-            console.error("Không tìm thấy sản phẩm.");
-          }
-        } catch (error) {
-          console.error("Có lỗi xảy ra khi gọi API:", error);
-        } finally {
-          setLoading(false);
+      // Gọi API để thêm sản phẩm vào giỏ hàng
+      const response = await fetch(
+        `http://localhost:3000/api/v1/order?productID=${product?._id}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`, // Truyền token vào header
+          },
         }
-      };
+      );
 
-      fetchProductDetail();
+      const data = await response.json();
+      if (response.ok) {
+        alert("Product added to cart successfully!");
+      } else {
+        console.error("Failed to add product to cart:", data.message);
+        alert(data.message || "Failed to add product to cart.");
+      }
+    } catch (error) {
+      console.error("Error adding product to cart:", error);
+      alert("An error occurred. Please try again later.");
     }
-  }, [open, productId]);
-
-  if (loading) {
-    return <div>Đang tải...</div>;
-  }
-
-  if (!product) {
-    return <div>Không có dữ liệu sản phẩm.</div>;
-  }
+  };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="grid grid-cols-2 gap-8 sm:p-12 max-w-[90vw] sm:max-w-[80vw] lg:max-w-[70vw]">
         <div className="relative overflow-hidden rounded-lg">
           <img
-            src={product.img}
-            alt={product.name}
+            src={product?.img}
+            alt={product?.name}
             width={600}
             height={600}
             className="aspect-square w-full object-cover"
@@ -56,13 +55,11 @@ const ShoppingProductDetail = ({ open, setOpen, productId }) => {
         </div>
         <div className="flex flex-col gap-4">
           <div>
-
-            <h1 className="text-3xl font-extrabold">{product.name}</h1>
-            <p className="text-muted">{product.description}</p>
-
+            <h1 className="text-3xl font-extrabold">{product?.name}</h1>
+            <p className="text-muted">{product?.description}</p>
           </div>
           <div className="flex items-center justify-between">
-            <p className="text-3xl font-bold">{product.price} VND</p>
+            <p className="text-3xl font-bold">{product?.price} VND</p>
             <button
               onClick={() => setOpen(false)}
               className="px-4 py-2 bg-red-500 text-white rounded-lg"
@@ -80,7 +77,9 @@ const ShoppingProductDetail = ({ open, setOpen, productId }) => {
             </div>
             <p className="text-muted">(4.5)</p>
           </div>
-          <Button className="w-full">Add to cart</Button>
+          <Button className="w-full" onClick={handleAddToCart}>
+            Add to cart
+          </Button>
           <Separator />
           <div className="max-h-[300px] overflow-auto">
             <h2 className="text-xl font-bold mb-4">Reviews</h2>
