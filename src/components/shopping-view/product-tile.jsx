@@ -4,7 +4,39 @@ import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
 
 const ShoppingProductTitle = ({ product }) => {
-  const { img, name, category, price, hot } = product;
+  const { img, name, category, price, hot, _id } = product;
+
+  // Hàm xử lý khi nhấn nút "Add to cart"
+  const handleAddToCart = async () => {
+    try {
+      // Lấy token từ localStorage
+      const token = localStorage.getItem("accessToken");
+      if (!token) {
+        alert("You need to log in first.");
+        return;
+      }
+
+      // Gọi API để thêm sản phẩm vào giỏ hàng
+      const response = await fetch(`http://localhost:3000/api/v1/order?productID=${_id}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`, // Truyền token vào header
+        },
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        alert("Product added to cart successfully!");
+      } else {
+        console.error("Failed to add product to cart:", data.message);
+        alert(data.message || "Failed to add product to cart.");
+      }
+    } catch (error) {
+      console.error("Error adding product to cart:", error);
+      alert("An error occurred. Please try again later.");
+    }
+  };
 
   return (
     <Card className="w-full max-w-sm mx-auto">
@@ -28,7 +60,9 @@ const ShoppingProductTitle = ({ product }) => {
         <div className="text-lg text-red-500 font-bold">{price} VND</div>
       </CardContent>
       <CardFooter>
-        <Button className="w-full">Add to cart</Button>
+        <Button className="w-full" onClick={handleAddToCart}>
+          Add to cart
+        </Button>
       </CardFooter>
     </Card>
   );
