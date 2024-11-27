@@ -23,11 +23,11 @@ import UserCartWrapper from "./cart-wrapper";
 
 const ShoppingHeader = () => {
   const [categories, setCategories] = useState([]); // State to store categories
-  const [open, setOpen] = useState(false);
-  const [openCartSheet, setOpenCartSheet] = useState(false);
+  const [openMenu, setOpenMenu] = useState(false); // For mobile menu
+  const [openCartSheet, setOpenCartSheet] = useState(false); // For cart
+  const navigate = useNavigate();
 
   const users = true; // Replace this with actual user state logic
-  const navigate = useNavigate();
 
   // Fetch categories from API
   useEffect(() => {
@@ -35,7 +35,7 @@ const ShoppingHeader = () => {
       try {
         const response = await fetch("http://localhost:3000/api/v1/category");
         const data = await response.json();
-        if (data && data.data) {
+        if (data?.data) {
           setCategories(data.data);
         }
       } catch (error) {
@@ -48,11 +48,14 @@ const ShoppingHeader = () => {
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-muted/10">
       <div className="flex h-16 items-center justify-between px-4 md:px-6">
-        <Link to={"/shop/home"} className="flex items-center gap-2">
+        {/* Logo */}
+        <Link to="/shop/home" className="flex items-center gap-2">
           <HousePlug className="h-6 w-6" />
           <span className="font-bold">Ecommerce</span>
         </Link>
-        <Sheet open={open} onOpenChange={setOpen}>
+
+        {/* Mobile menu */}
+        <Sheet open={openMenu} onOpenChange={setOpenMenu}>
           <SheetTrigger asChild>
             <Button variant="outline" size="icon" className="lg:hidden">
               <Menu className="h-6 w-6" />
@@ -60,140 +63,102 @@ const ShoppingHeader = () => {
             </Button>
           </SheetTrigger>
           <SheetContent side="left" className="w-full max-w-xs">
-            <nav className="flex flex-col mb-3 lg:mb-0 lg:items-center gap-6 lg:flex-row">
+            <nav className="flex flex-col gap-6">
               {categories.map((category) => (
                 <Link
                   key={category._id}
-                  onClick={() => setOpen(false)}
+                  onClick={() => setOpenMenu(false)}
                   className="text-sm font-medium"
-                  to={`/shop/category/${category._id}`} // Assuming categories have unique IDs
+                  to={`/shop/category/${category._id}`}
                 >
                   {category.name}
                 </Link>
               ))}
               {users ? (
-                <div className="flex lg:items-center lg:flex-row flex-col gap-4">
-                  <Sheet
-                    open={openCartSheet}
-                    onOpenChange={() => setOpenCartSheet(false)}
-                  >
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      onClick={() => setOpenCartSheet(true)}
-                    >
-                      <ShoppingCart className="w-6 h-6" />
-                      <span className="sr-only">User cart</span>
-                    </Button>
-                    <UserCartWrapper setOpenCartSheet={setOpenCartSheet}/>
-                  </Sheet>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger>
-                      <Avatar className="bg-black">
-                        <AvatarFallback className="bg-black text-white font-extrabold">
-                          {/* UserName[0].toUpperCase  */}T
-                        </AvatarFallback>
-                      </Avatar>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent side="right" className="w-56">
-                      <DropdownMenuLabel>
-                        Logged in as userName
-                      </DropdownMenuLabel>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem
-                        className="cursor-pointer"
-                        onClick={() => {
-                          navigate("/shop/account");
-                          setOpen(false);
-                        }}
-                      >
-                        <UserCog className="mr-2 h-4 w-4" />
-                        Account
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem>
-                        <LogOut className="mr-2 h-4 w-4" />
-                        Logout
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
+                <UserActions
+                  onCartOpen={() => setOpenCartSheet(true)}
+                  onLogout={() => console.log("Logout clicked")}
+                  navigate={navigate}
+                />
               ) : (
-                <span className="bg-muted/30 hover:bg-muted/40 font-bold text-sm rounded-full h-10 w-20 items-center justify-center flex gap-1 cursor-pointer">
-                  <LogInIcon size={17} /> <span>Login</span>
-                </span>
+                <GuestLogin />
               )}
             </nav>
           </SheetContent>
         </Sheet>
-        <div className="hidden lg:block">
-          <nav className="flex flex-col mb-3 lg:mb-0 lg:items-center gap-6 lg:flex-row">
-            <Link className="text-sm font-medium" to={"/shop/listing"}>
-              Store
+
+        {/* Desktop menu */}
+        <div className="hidden lg:flex lg:items-center lg:gap-6">
+          <Link className="text-sm font-medium" to="/shop/listing">
+            Store
+          </Link>
+          {categories.map((category) => (
+            <Link
+              key={category._id}
+              className="text-sm font-medium"
+              to={`/shop/category/${category._id}`}
+            >
+              {category.name}
             </Link>
-            {categories.map((category) => (
-              <Link
-                key={category._id}
-                className="text-sm font-medium"
-                to={`/shop/listing`}
-              >
-                {category.name}
-              </Link>
-            ))}
-          </nav>
-        </div>
-        <div className="hidden lg:block">
+          ))}
           {users ? (
-            <div className="flex lg:items-center lg:flex-row flex-col gap-4">
-              <Sheet
-                open={openCartSheet}
-                onOpenChange={() => setOpenCartSheet(false)}
-              >
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={() => setOpenCartSheet(true)}
-                >
-                  <ShoppingCart className="w-6 h-6" />
-                  <span className="sr-only">User cart</span>
-                </Button>
-                <UserCartWrapper />
-              </Sheet>
-              <DropdownMenu>
-                <DropdownMenuTrigger>
-                  <Avatar className="bg-black">
-                    <AvatarFallback className="bg-black text-white font-extrabold">
-                      {/* UserName[0].toUpperCase  */}T
-                    </AvatarFallback>
-                  </Avatar>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent side="right" className="w-56">
-                  <DropdownMenuLabel>Logged in as userName</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    className="cursor-pointer"
-                    onClick={() => navigate("/shop/account")}
-                  >
-                    <UserCog className="mr-2 h-4 w-4" />
-                    Account
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem>
-                    <LogOut className="mr-2 h-4 w-4" />
-                    Logout
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
+            <UserActions
+              onCartOpen={() => setOpenCartSheet(true)}
+              onLogout={() => console.log("Logout clicked")}
+              navigate={navigate}
+            />
           ) : (
-            <span className="bg-muted/30 hover:bg-muted/40 font-bold text-sm rounded-full h-10 w-20 items-center justify-center flex gap-1 cursor-pointer">
-              <LogInIcon size={17} /> <span>Login</span>
-            </span>
+            <GuestLogin />
           )}
         </div>
+
+        {/* Cart Sheet */}
+        <Sheet open={openCartSheet} onOpenChange={setOpenCartSheet}>
+          <SheetContent side="right" className="p-0">
+            <UserCartWrapper />
+          </SheetContent>
+        </Sheet>
       </div>
     </header>
   );
 };
+
+// User actions for logged-in users
+const UserActions = ({ onCartOpen, onLogout, navigate }) => (
+  <div className="flex items-center gap-4">
+    <Button variant="outline" size="icon" onClick={onCartOpen}>
+      <ShoppingCart className="w-6 h-6" />
+      <span className="sr-only">User cart</span>
+    </Button>
+    <DropdownMenu>
+      <DropdownMenuTrigger>
+        <Avatar className="bg-black">
+          <AvatarFallback className="bg-black text-white font-extrabold">T</AvatarFallback>
+        </Avatar>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent side="right" className="w-56">
+        <DropdownMenuLabel>Logged in as UserName</DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem onClick={() => navigate("/shop/account")}>
+          <UserCog className="mr-2 h-4 w-4" />
+          Account
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem onClick={onLogout}>
+          <LogOut className="mr-2 h-4 w-4" />
+          Logout
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  </div>
+);
+
+// Component for guest login
+const GuestLogin = () => (
+  <span className="bg-muted/30 hover:bg-muted/40 font-bold text-sm rounded-full h-10 w-20 items-center justify-center flex gap-1 cursor-pointer">
+    <LogInIcon size={17} />
+    <span>Login</span>
+  </span>
+);
 
 export default ShoppingHeader;
