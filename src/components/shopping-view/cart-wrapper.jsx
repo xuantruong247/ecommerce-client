@@ -6,7 +6,6 @@ import { useNavigate } from "react-router-dom";
 
 const UserCartWrapper = ({ setOpenCartSheet }) => {
   const [cartItems, setCartItems] = useState([]);
-  const [total, setTotal] = useState(0);
   const navigate = useNavigate();
 
   // Gọi API để lấy dữ liệu giỏ hàng
@@ -33,8 +32,6 @@ const UserCartWrapper = ({ setOpenCartSheet }) => {
         const items = result.data || [];
         setCartItems(items);
 
-        // Tính tổng giá trị
-        calculateTotal(items);
       } catch (error) {
         console.error("Error fetching cart data:", error.message);
       }
@@ -43,29 +40,21 @@ const UserCartWrapper = ({ setOpenCartSheet }) => {
     fetchCartData();
   }, []);
 
-  // Tính tổng giá trị giỏ hàng
-  const calculateTotal = (items) => {
-    const totalAmount = items.reduce(
-      (acc, item) => acc + item.total,
-      0
-    );
-    setTotal(totalAmount);
-  };
-
   return (
     <SheetContent className="sm:max-w-md">
       <SheetHeader>
         <SheetTitle>Your Cart</SheetTitle>
       </SheetHeader>
       <div className="mt-8 space-y-4">
-        {/* Truyền dữ liệu giỏ hàng xuống thành phần con */}
         <UserCartItemsContent cartItems={cartItems} />
       </div>
       <div className="mt-8 space-y-4">
-        <div className="flex justify-between">
-          <span className="font-bold">Total</span>
-          <span className="font-bold">{total.toLocaleString()} vnd</span>
-        </div>
+        {cartItems.map((item) => (
+          <div key={item._id} className="flex justify-between">
+            <span className="font-bold">Total</span>
+            <span className="font-bold">{item.total} vnd</span>
+          </div>
+        ))}
       </div>
       <Button
         onClick={() => {
