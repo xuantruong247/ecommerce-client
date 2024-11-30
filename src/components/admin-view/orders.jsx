@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import {
   Table,
@@ -10,9 +10,53 @@ import {
 } from "../ui/table";
 import { Button } from "../ui/button";
 import { Dialog } from "../ui/dialog";
-import AdminOderDetail from "../../pages/admin-view/order-detail";
+import AdminOrderDetail from "../../pages/admin-view/order-detail";
+
 const AdminOrdersCpn = () => {
   const [openDetail, setOpenDetail] = useState(false);
+  const [orders, setOrders] = useState([]);
+  const [selectedOrder, setSelectedOrder] = useState(null);
+
+  const fetchOrders = () => {
+    const accessToken = localStorage.getItem("accessToken");
+
+    if (!accessToken) {
+      console.error("Access token not found in localStorage");
+      return;
+    }
+
+    fetch("http://localhost:3000/api/v1/order", {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.statusCode === 200) {
+          setOrders(data.data);
+        } else {
+          console.error("Error fetching orders:", data.message);
+        }
+      })
+      .catch((error) => console.error("Error fetching orders:", error));
+  };
+
+  useEffect(() => {
+    fetchOrders(); // Gọi API lấy danh sách đơn hàng
+  }, []);
+
+  const handleViewDetails = (orderId) => {
+    setSelectedOrder(orderId);
+    setOpenDetail(true);
+  };
+
+  const handleStatusUpdate = () => {
+    fetchOrders(); // Cập nhật lại danh sách đơn hàng sau khi cập nhật trạng thái
+    setOpenDetail(false); // Đóng dialog sau khi cập nhật
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -32,23 +76,30 @@ const AdminOrdersCpn = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            <TableRow>
-              <TableCell>123456</TableCell>
-              <TableCell>26/11/2024</TableCell>
-              <TableCell>Pending</TableCell>
-              <TableCell>30.000.000vnd</TableCell>
-              <TableCell>
-                <Dialog open={openDetail} onOpenChange={setOpenDetail}>
-                  <Button onClick={() => setOpenDetail(true)}>
+            {orders.map((order) => (
+              <TableRow key={order._id}>
+                <TableCell>{order._id}</TableCell>
+                <TableCell>{new Date(order.createdAt).toLocaleDateString()}</TableCell>
+                <TableCell>{order.status || "N/A"}</TableCell>
+                <TableCell>{order.total.toLocaleString()} VND</TableCell>
+                <TableCell>
+                  <Button onClick={() => handleViewDetails(order._id)}>
                     View Details
                   </Button>
-                  <AdminOderpDetail />
-                </Dialog>
-              </TableCell>
-            </TableRow>
+                </TableCell>
+              </TableRow>
+            ))}
           </TableBody>
         </Table>
       </CardContent>
+      <Dialog open={openDetail} onOpenChange={setOpenDetail}>
+        {selectedOrder && (
+          <AdminOrderDetail
+            orderId={selectedOrder}
+            onStatusUpdate={handleStatusUpdate}
+          />
+        )}
+      </Dialog>
     </Card>
   );
 };
