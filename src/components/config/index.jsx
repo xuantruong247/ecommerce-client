@@ -64,23 +64,11 @@ export const sortByCategory = [
 
 export const Status =[
   {
-    id:"inProcess",
-    label:"In Process"
+    id:"completed",
+    label:"Completed"
   },
   {
-    id:"inShipping",
-    label:"In Shipping"
+    id:"cancelled",
+    label:"Cancelled"
   },
-  {
-    id:"rejected",
-    label:"Rejected"
-  },
-  {
-    id:"accessories",
-    label:"Accessories"
-  },
-  {
-    id:"footwear",
-    label:"Footwear"
-  }
 ]
