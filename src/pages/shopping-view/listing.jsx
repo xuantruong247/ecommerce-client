@@ -17,9 +17,11 @@ const ShoppingListing = () => {
   const [loading, setLoading] = useState(false);
   const [openDetail, setOpenDetail] = useState(false);
   const [currentProductId, setCurrentProductId] = useState(null);
+  const [loadingDetail, setLoadingDetail] = useState(false); // Thêm state cho loading chi tiết
 
   // Fetch dữ liệu sản phẩm từ API
   const fetchGetProduct = async () => {
+    setLoading(true); // Bắt đầu tải dữ liệu sản phẩm
     try {
       const response = await axios.get("http://localhost:3000/api/v1/product");
       if (response.data?.data?.items) {
@@ -27,12 +29,14 @@ const ShoppingListing = () => {
       }
     } catch (error) {
       console.error("Lỗi khi gọi API:", error);
+    } finally {
+      setLoading(false); // Kết thúc tải dữ liệu sản phẩm
     }
   };
 
   // Fetch chi tiết sản phẩm
   const productByDetail = async (productId) => {
-    setLoading(true);
+    setLoadingDetail(true); // Bắt đầu tải chi tiết sản phẩm
     try {
       const response = await axios.get(
         `http://localhost:3000/api/v1/product/${productId}`
@@ -42,13 +46,13 @@ const ShoppingListing = () => {
     } catch (error) {
       console.error("Có lỗi xảy ra khi gọi API:", error);
     } finally {
-      setLoading(false);
+      setLoadingDetail(false); // Kết thúc tải chi tiết sản phẩm
     }
   };
 
   useEffect(() => {
     fetchGetProduct();
-  }, []);
+  }, [categoryFromUrl]); // Fetch lại sản phẩm khi category thay đổi
 
   // Lọc sản phẩm theo category đã chọn
   const filteredProducts = selectedCategories.length
@@ -69,21 +73,28 @@ const ShoppingListing = () => {
           <h2 className="text-lg font-extrabold">All Products</h2>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
-          {filteredProducts.map((product) => (
-            <ShoppingProductTitle
-              key={product._id}
-              product={product}
-              productByDetail={(id) => productByDetail(id)}
-            />
-          ))}
+          {loading ? ( // Hiển thị loading khi đang tải sản phẩm
+            <div>Loading products...</div>
+          ) : (
+            filteredProducts.map((product) => (
+              <ShoppingProductTitle
+                key={product._id}
+                product={product}
+                productByDetail={(id) => productByDetail(id)}
+              />
+            ))
+          )}
         </div>
       </div>
 
-      <ShoppingProductDetail
-        open={openDetail}
-        setOpen={setOpenDetail}
-        product={currentProductId}
-      />
+      {openDetail && (
+        <ShoppingProductDetail
+          open={openDetail}
+          setOpen={setOpenDetail}
+          product={currentProductId}
+        />
+      )}
+      {loadingDetail && <div>Loading product details...</div>} {/* Hiển thị loading khi đang tải chi tiết sản phẩm */}
     </div>
   );
 };
