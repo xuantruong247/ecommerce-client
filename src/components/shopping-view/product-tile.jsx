@@ -7,7 +7,6 @@ const ShoppingProductTitle = ({ product,productByDetail }) => {
   const { img, name, category, price, hot, _id } = product;
 
 
-  // Hàm xử lý khi nhấn nút "Add to cart"
   const handleAddToCart = async () => {
     try {
       // Lấy token từ localStorage

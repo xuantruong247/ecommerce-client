@@ -6,30 +6,72 @@ import bannerOne from "../../assets/bannerOne.webp";
 import bannerTwo from "../../assets/bannerTwo.jpg";
 import bannerThree from "../../assets/bannerThree.avif";
 import { Card, CardContent } from "../../components/ui/card";
+import ShoppingProductTitle from "../../components/shopping-view/product-tile"; // Import Product Component
+import ShoppingProductDetail from "../../components/shopping-view/product-detail"; // Import Product Detail Component
 
 const ShoppingHome = () => {
   const navigate = useNavigate();
   const slide = [bannerThree, bannerOne, bannerTwo];
   const [currentSlide, setCurrenSlide] = useState(0);
   const [categories, setCategories] = useState([]);
+  const [products, setProducts] = useState([]);
+  const [currentProductId, setCurrentProductId] = useState(null); // Product ID for detail
+  const [openDetail, setOpenDetail] = useState(false); // Open product detail modal
 
-  // Gọi API để lấy danh mục
+  // Fetch Categories
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await fetch("http://localhost:3000/api/v1/category");
+        const accessToken = localStorage.getItem("accessToken");
+        const response = await fetch("http://localhost:3000/api/v1/category", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
         const data = await response.json();
         if (data && data.data) {
-          setCategories(data.data); // Gán danh mục từ API
+          setCategories(data.data);
         }
       } catch (error) {
         console.error("Failed to fetch categories:", error);
       }
     };
     fetchCategories();
-  }, []); // Chỉ gọi API 1 lần khi component mount
+  }, []);
 
-  // Xử lý tự động chuyển slide
+  // Fetch Products
+  const fetchProducts = async () => {
+    try {
+      const accessToken = localStorage.getItem("accessToken");
+      const response = await fetch("http://localhost:3000/api/v1/product?limit=12&hot=true", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      if (response.status === 401) {
+        console.error("Unauthorized! Token expired or invalid.");
+        return;
+      }
+
+      const data = await response.json();
+      if (data && data.data && data.data.items) {
+        setProducts(data.data.items);
+      }
+    } catch (error) {
+      console.error("Failed to fetch products:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
+  // Auto Slide
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrenSlide((prevSlide) => (prevSlide + 1) % slide.length);
@@ -37,9 +79,15 @@ const ShoppingHome = () => {
     return () => clearInterval(timer);
   }, []);
 
-  // Chuyển hướng đến trang shop/listing với category đã chọn
+  // Navigate to category listing
   const handleCategoryClick = (category) => {
     navigate(`/shop/listing?category=${category}`);
+  };
+
+  // Open product detail
+  const handleProductDetail = (productId) => {
+    setCurrentProductId(productId);
+    setOpenDetail(true);
   };
 
   return (
@@ -86,7 +134,7 @@ const ShoppingHome = () => {
               <Card
                 key={item._id}
                 className="cursor-pointer hover:shadow-lg transition-shadow"
-                onClick={() => handleCategoryClick(item.name)} // Chuyển hướng khi bấm vào danh mục
+                onClick={() => handleCategoryClick(item.name)}
               >
                 <CardContent className="flex flex-col items-center justify-center p-6">
                   <span className="font-bold">{item.name}</span>
@@ -96,6 +144,31 @@ const ShoppingHome = () => {
           </div>
         </div>
       </section>
+
+      {/* Products Section */}
+      <section className="py-12 bg-white">
+        <div className="container mx-auto px-4">
+          <h2 className="text-3xl font-bold text-center mb-8">Featured Products</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {products.map((product) => (
+              <ShoppingProductTitle
+                key={product._id}
+                product={product}
+                productByDetail={handleProductDetail}
+              />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Product Detail Modal */}
+      {openDetail && (
+        <ShoppingProductDetail
+          open={openDetail}
+          setOpen={setOpenDetail}
+          product={products.find((product) => product._id === currentProductId)}
+        />
+      )}
     </div>
   );
 };
