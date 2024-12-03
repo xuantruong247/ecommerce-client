@@ -6,8 +6,8 @@ import bannerOne from "../../assets/bannerOne.webp";
 import bannerTwo from "../../assets/bannerTwo.jpg";
 import bannerThree from "../../assets/bannerThree.avif";
 import { Card, CardContent } from "../../components/ui/card";
-import ShoppingProductTitle from "../../components/shopping-view/product-tile"; // Import Product Component
-import ShoppingProductDetail from "../../components/shopping-view/product-detail"; // Import Product Detail Component
+import ShoppingProductTitle from "../../components/shopping-view/product-tile"; 
+import ShoppingProductDetail from "../../components/shopping-view/product-detail"; 
 
 const ShoppingHome = () => {
   const navigate = useNavigate();
@@ -15,8 +15,8 @@ const ShoppingHome = () => {
   const [currentSlide, setCurrenSlide] = useState(0);
   const [categories, setCategories] = useState([]);
   const [products, setProducts] = useState([]);
-  const [currentProductId, setCurrentProductId] = useState(null); // Product ID for detail
-  const [openDetail, setOpenDetail] = useState(false); // Open product detail modal
+  const [searchKeyword, setSearchKeyword] = useState("");
+  const [openDetail, setOpenDetail] = useState(false); 
 
   // Fetch Categories
   useEffect(() => {
@@ -41,11 +41,16 @@ const ShoppingHome = () => {
     fetchCategories();
   }, []);
 
-  // Fetch Products
   const fetchProducts = async () => {
     try {
       const accessToken = localStorage.getItem("accessToken");
-      const response = await fetch("http://localhost:3000/api/v1/product?limit=12&hot=true", {
+      const query = new URLSearchParams({
+        limit: 12,
+        hot: true,
+        ...(searchKeyword && { name: searchKeyword }), 
+      }).toString();
+
+      const response = await fetch(`http://localhost:3000/api/v1/product?${query}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -68,10 +73,13 @@ const ShoppingHome = () => {
   };
 
   useEffect(() => {
-    fetchProducts();
-  }, []);
+    const timeoutId = setTimeout(() => {
+      fetchProducts();
+    }, 500); 
 
-  // Auto Slide
+    return () => clearTimeout(timeoutId);
+  }, [searchKeyword]);
+
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrenSlide((prevSlide) => (prevSlide + 1) % slide.length);
@@ -98,9 +106,8 @@ const ShoppingHome = () => {
           <img
             src={slide}
             key={index}
-            className={`${
-              index === currentSlide ? "opacity-100" : "opacity-0"
-            } absolute top-0 left-0 w-full object-cover transition-opacity duration-1000`}
+            className={`${index === currentSlide ? "opacity-100" : "opacity-0"
+              } absolute top-0 left-0 w-full object-cover transition-opacity duration-1000`}
           />
         ))}
         <Button
@@ -144,6 +151,17 @@ const ShoppingHome = () => {
           </div>
         </div>
       </section>
+
+      {/* Search Bar */}
+      <div className="container mx-auto px-4 my-4">
+        <input
+          type="text"
+          value={searchKeyword}
+          onChange={(e) => setSearchKeyword(e.target.value)}
+          placeholder="Search for products..."
+          className="w-full p-2 border rounded-md"
+        />
+      </div>
 
       {/* Products Section */}
       <section className="py-12 bg-white">

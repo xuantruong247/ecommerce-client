@@ -10,7 +10,7 @@ const AuthLogin = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const navigate = useNavigate(); // Hook để điều hướng
+  const navigate = useNavigate(); 
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -29,16 +29,13 @@ const AuthLogin = () => {
       const data = await response.json();
       if (response.ok) {
 
-        // Lưu accessToken vào localStorage
         const { accessToken, refreshToken } = data.data;
         localStorage.setItem("accessToken", accessToken);
         localStorage.setItem("refreshToken", refreshToken);
 
-        // Giải mã token để lấy thông tin role
         const payload = JSON.parse(atob(accessToken.split(".")[1]));
         const userRole = payload.role;
 
-        // Điều hướng dựa trên role
         if (userRole === "user") {
           navigate("/shop/home");
         } else if (userRole === "admin") {

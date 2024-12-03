@@ -9,19 +9,17 @@ const ShoppingProductTitle = ({ product,productByDetail }) => {
 
   const handleAddToCart = async () => {
     try {
-      // Lấy token từ localStorage
       const token = localStorage.getItem("accessToken");
       if (!token) {
         alert("You need to log in first.");
         return;
       }
 
-      // Gọi API để thêm sản phẩm vào giỏ hàng
       const response = await fetch(`http://localhost:3000/api/v1/order?productID=${_id}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`, // Truyền token vào header
+          Authorization: `Bearer ${token}`, 
         },
       });
 

@@ -45,6 +45,13 @@ const ShoppingHeader = () => {
     fetchCategories();
   }, []);
 
+  // Logout function
+  const onLogout = () => {
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+    navigate('/auth/login');  // Navigate to login page after logout
+  };
+
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-muted/10">
       <div className="flex h-16 items-center justify-between px-4 md:px-6">
@@ -77,7 +84,7 @@ const ShoppingHeader = () => {
               {users ? (
                 <UserActions
                   onCartOpen={() => setOpenCartSheet(true)}
-                  onLogout={() => console.log("Logout clicked")}
+                  onLogout={onLogout}  // Pass onLogout here
                   navigate={navigate}
                 />
               ) : (
@@ -104,7 +111,7 @@ const ShoppingHeader = () => {
           {users ? (
             <UserActions
               onCartOpen={() => setOpenCartSheet(true)}
-              onLogout={() => console.log("Logout clicked")}
+              onLogout={onLogout}  // Pass onLogout here
               navigate={navigate}
             />
           ) : (
@@ -123,7 +130,6 @@ const ShoppingHeader = () => {
   );
 };
 
-// User actions for logged-in users
 const UserActions = ({ onCartOpen, onLogout, navigate }) => (
   <div className="flex items-center gap-4">
     <Button variant="outline" size="icon" onClick={onCartOpen}>
@@ -144,7 +150,7 @@ const UserActions = ({ onCartOpen, onLogout, navigate }) => (
           Account
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={onLogout}>
+        <DropdownMenuItem onClick={onLogout}>  {/* Call onLogout */}
           <LogOut className="mr-2 h-4 w-4" />
           Logout
         </DropdownMenuItem>

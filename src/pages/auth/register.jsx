@@ -7,6 +7,8 @@ import { Button } from "../../components/ui/button";
 const AuthRegister = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [address, setAddress] = useState(""); // Thêm state cho address
+  const [phone, setPhone] = useState(""); // Thêm state cho phone
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
@@ -30,6 +32,8 @@ const AuthRegister = () => {
           body: JSON.stringify({
             email,
             password,
+            address, // Gửi address
+            phone, // Gửi phone
             role: "user", // Role mặc định là "user"
           }),
         }
@@ -88,6 +92,28 @@ const AuthRegister = () => {
             placeholder="Enter your password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+          />
+        </div>
+        <div>
+          <Label htmlFor="address">Address</Label>
+          <Input
+            type="text"
+            name="address"
+            id="address"
+            placeholder="Enter your address"
+            value={address}
+            onChange={(e) => setAddress(e.target.value)}
+          />
+        </div>
+        <div>
+          <Label htmlFor="phone">Phone</Label>
+          <Input
+            type="text"
+            name="phone"
+            id="phone"
+            placeholder="Enter your phone number"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
           />
         </div>
         {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
