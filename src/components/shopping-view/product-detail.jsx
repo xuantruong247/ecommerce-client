@@ -9,10 +9,9 @@ import { Input } from "../ui/input";
 const ShoppingProductDetail = ({ open, setOpen, product }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [comments, setComments] = useState([]); // State để lưu bình luận
-  const [newComment, setNewComment] = useState(""); // State để lưu nội dung bình luận mới
+  const [comments, setComments] = useState([]);
+  const [newComment, setNewComment] = useState(""); 
 
-  // Gọi API để lấy bình luận của sản phẩm
   useEffect(() => {
     const fetchComments = async () => {
       try {
@@ -26,14 +25,14 @@ const ShoppingProductDetail = ({ open, setOpen, product }) => {
           `http://localhost:3000/api/v1/comment/${product?._id}`,
           {
             headers: {
-              Authorization: `Bearer ${token}`, // Thêm token vào header
+              Authorization: `Bearer ${token}`, 
             },
           }
         );
 
         const data = await response.json();
         if (response.ok) {
-          setComments(data.data?.data || []); // Lưu dữ liệu bình luận vào state từ data.data
+          setComments(data.data?.data || []);
         } else {
           setError(data.message || "Failed to fetch comments.");
         }
@@ -48,7 +47,6 @@ const ShoppingProductDetail = ({ open, setOpen, product }) => {
     }
   }, [product?._id]);
 
-  // Gửi bình luận mới
   const handleSubmit = async () => {
     if (!newComment.trim()) {
       setError("Comment cannot be empty.");
@@ -82,7 +80,6 @@ const ShoppingProductDetail = ({ open, setOpen, product }) => {
 
       const data = await response.json();
       if (response.ok) {
-        // Cập nhật lại danh sách bình luận
         setComments((prevComments) => [
           ...prevComments,
           { message: newComment, userID: "You", _id: Date.now() }, // Thêm bình luận mới vào danh sách

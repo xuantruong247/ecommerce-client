@@ -17,7 +17,6 @@ const ShoppingOrders = () => {
   const [openDetail, setOpenDetail] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
 
-  // Gọi API để lấy danh sách đơn hàng
   useEffect(() => {
     const fetchOrders = async () => {
       const accessToken = localStorage.getItem("accessToken");
@@ -27,11 +26,14 @@ const ShoppingOrders = () => {
       }
 
       try {
-        const response = await fetch("http://localhost:3000/api/v1/order", {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        });
+        const response = await fetch(
+          "http://localhost:3000/api/v1/order/history",
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+          }
+        );
 
         if (!response.ok) {
           throw new Error("Failed to fetch orders");
@@ -47,6 +49,11 @@ const ShoppingOrders = () => {
     fetchOrders();
   }, []);
 
+  const handleCheckout = () => {
+    console.log("Checkout completed!");
+    window.location.reload();
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -60,9 +67,9 @@ const ShoppingOrders = () => {
               <TableHead>Order Date</TableHead>
               <TableHead>Order Status</TableHead>
               <TableHead>Order Price</TableHead>
-              <TableHead>
+              {/* <TableHead>
                 <span className="sr-only">Details</span>
-              </TableHead>
+              </TableHead> */}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -72,18 +79,18 @@ const ShoppingOrders = () => {
                 <TableCell>
                   {new Date(order.createdAt).toLocaleDateString()}
                 </TableCell>
-                <TableCell>{order.status }</TableCell>
+                <TableCell>{order.status}</TableCell>
                 <TableCell>{order.total} vnd</TableCell>
                 <TableCell>
                   <Dialog open={openDetail} onOpenChange={setOpenDetail}>
-                    <Button
+                    {/* <Button
                       onClick={() => {
                         setSelectedOrder(order);
                         setOpenDetail(true);
                       }}
                     >
                       View Details
-                    </Button>
+                    </Button> */}
                     {selectedOrder && selectedOrder._id === order._id && (
                       <ShoppingOrderDetail
                         setOpenDetail={setOpenDetail}
@@ -96,6 +103,7 @@ const ShoppingOrders = () => {
             ))}
           </TableBody>
         </Table>
+
       </CardContent>
     </Card>
   );

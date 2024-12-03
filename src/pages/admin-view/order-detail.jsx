@@ -4,7 +4,7 @@ import { Separator } from "../../components/ui/separator";
 import { Label } from "../../components/ui/label";
 import { Status } from "../../components/config";
 import { Button } from "../../components/ui/button";
-const AdminOrderDetail = ({ orderId }) => {
+const   AdminOrderDetail = ({ orderId }) => {
   const [orderDetails, setOrderDetails] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -117,6 +117,16 @@ const AdminOrderDetail = ({ orderId }) => {
           <div className="flex mt-2 items-center justify-between">
             <p className="font-medium">Order Status</p>
             <Label htmlFor="">{orderDetails.status || "N/A"}</Label>
+          </div>
+
+          <div className="flex mt-2 items-center justify-between">
+            <p className="font-medium">Order Address</p>
+            <Label htmlFor="">{orderDetails.address || "N/A"}</Label>
+          </div>
+
+          <div className="flex mt-2 items-center justify-between">
+            <p className="font-medium">Order Phone</p>
+            <Label htmlFor="">{orderDetails.phone || "N/A"}</Label>
           </div>
         </div>
         <Separator />

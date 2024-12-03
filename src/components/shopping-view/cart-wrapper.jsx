@@ -57,9 +57,40 @@ const UserCartWrapper = ({ setOpenCartSheet }) => {
         ))}
       </div>
       <Button
-        onClick={() => {
-          navigate("/shop/checkout");
-          setOpenCartSheet(false);
+        onClick={async () => {
+          const accessToken = localStorage.getItem("accessToken");
+          if (!accessToken) {
+            console.error("Access token not found!");
+            return;
+          }
+
+          try {
+            // Giả sử orderId được lấy từ dữ liệu giỏ hàng (ví dụ: cartItems[0]._id)
+            const orderId = cartItems[0]?._id; 
+            if (!orderId) {
+              console.error("Order ID not found!");
+              return;
+            }
+
+            const response = await fetch(`http://localhost:3000/api/v1/order/status/${orderId}`, {
+              method: "PUT", 
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${accessToken}`,
+              },
+              body: JSON.stringify({ status: "completed" }), 
+            });
+
+            if (!response.ok) {
+              throw new Error("Failed to update order status");
+            }
+
+            console.log("Order status updated successfully");
+            // Chuyển về trang /shop/home4
+            navigate("/shop/home");
+          } catch (error) {
+            console.error("Error updating order status:", error.message);
+          }
         }}
         className="w-full mt-5"
       >

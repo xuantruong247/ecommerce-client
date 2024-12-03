@@ -69,6 +69,8 @@ const AdminOrdersCpn = () => {
               <TableHead>Order ID</TableHead>
               <TableHead>Order Date</TableHead>
               <TableHead>Order Status</TableHead>
+              <TableHead>Order Address</TableHead>
+              <TableHead>Order PhoneNumber</TableHead>
               <TableHead>Order Price</TableHead>
               <TableHead>
                 <span className="sr-only">Details</span>
@@ -81,6 +83,8 @@ const AdminOrdersCpn = () => {
                 <TableCell>{order._id}</TableCell>
                 <TableCell>{new Date(order.createdAt).toLocaleDateString()}</TableCell>
                 <TableCell>{order.status || "N/A"}</TableCell>
+                <TableCell>{order.address || "N/A"}</TableCell>
+                <TableCell>{order.phone || "N/A"}</TableCell>
                 <TableCell>{order.total.toLocaleString()} VND</TableCell>
                 <TableCell>
                   <Button onClick={() => handleViewDetails(order._id)}>

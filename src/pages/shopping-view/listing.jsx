@@ -8,35 +8,40 @@ import ShoppingProductDetail from "../../components/shopping-view/product-detail
 const ShoppingListing = () => {
   const { search } = useLocation();
   const params = new URLSearchParams(search);
-  const categoryFromUrl = params.get("category"); // Lấy category từ query params
+  const categoryFromUrl = params.get("category"); 
 
   const [selectedCategories, setSelectedCategories] = useState(
-    categoryFromUrl ? [categoryFromUrl] : [] // Nếu có category, gán vào state
+    categoryFromUrl ? [categoryFromUrl] : []
   );
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [openDetail, setOpenDetail] = useState(false);
   const [currentProductId, setCurrentProductId] = useState(null);
-  const [loadingDetail, setLoadingDetail] = useState(false); // Thêm state cho loading chi tiết
-
-  // Fetch dữ liệu sản phẩm từ API
+  const [loadingDetail, setLoadingDetail] = useState(false); 
+  const [searchKeyword, setSearchKeyword] = useState(""); 
   const fetchGetProduct = async () => {
-    setLoading(true); // Bắt đầu tải dữ liệu sản phẩm
+    setLoading(true); 
     try {
-      const response = await axios.get("http://localhost:3000/api/v1/product");
+      const query = new URLSearchParams({
+        ...(searchKeyword && { name: searchKeyword }),
+      }).toString();
+
+      const response = await axios.get(
+        `http://localhost:3000/api/v1/product?${query}`
+      );
+
       if (response.data?.data?.items) {
         setProducts(response.data.data.items);
       }
     } catch (error) {
       console.error("Lỗi khi gọi API:", error);
     } finally {
-      setLoading(false); // Kết thúc tải dữ liệu sản phẩm
+      setLoading(false);
     }
   };
 
-  // Fetch chi tiết sản phẩm
   const productByDetail = async (productId) => {
-    setLoadingDetail(true); // Bắt đầu tải chi tiết sản phẩm
+    setLoadingDetail(true);
     try {
       const response = await axios.get(
         `http://localhost:3000/api/v1/product/${productId}`
@@ -46,19 +51,22 @@ const ShoppingListing = () => {
     } catch (error) {
       console.error("Có lỗi xảy ra khi gọi API:", error);
     } finally {
-      setLoadingDetail(false); // Kết thúc tải chi tiết sản phẩm
+      setLoadingDetail(false);
     }
   };
 
   useEffect(() => {
-    fetchGetProduct();
-  }, [categoryFromUrl]); // Fetch lại sản phẩm khi category thay đổi
+    const timeoutId = setTimeout(() => {
+      fetchGetProduct();
+    }, 500);
 
-  // Lọc sản phẩm theo category đã chọn
+    return () => clearTimeout(timeoutId);
+  }, [categoryFromUrl, searchKeyword]);
+
   const filteredProducts = selectedCategories.length
     ? products.filter((product) =>
-        selectedCategories.includes(product.category)
-      )
+      selectedCategories.includes(product.category)
+    )
     : products;
 
   return (
@@ -69,9 +77,18 @@ const ShoppingListing = () => {
       />
 
       <div className="w-full rounded-lg shadow-sm bg-muted/5">
-        <div className="p-4 border-b">
+        {/* Thanh tìm kiếm */}
+        <div className="p-4 border-b flex items-center justify-between">
           <h2 className="text-lg font-extrabold">All Products</h2>
+          <input
+            type="text"
+            value={searchKeyword}
+            onChange={(e) => setSearchKeyword(e.target.value)}
+            placeholder="Search for products..."
+            className="border rounded-md p-2 w-1/2"
+          />
         </div>
+
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
           {loading ? ( // Hiển thị loading khi đang tải sản phẩm
             <div>Loading products...</div>
