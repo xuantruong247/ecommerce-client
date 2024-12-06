@@ -65,11 +65,10 @@ const ShoppingOrders = () => {
             <TableRow>
               <TableHead>Order ID</TableHead>
               <TableHead>Order Date</TableHead>
+              <TableHead>Sender</TableHead>
+              <TableHead>Recipient</TableHead>
               <TableHead>Order Status</TableHead>
               <TableHead>Order Price</TableHead>
-              {/* <TableHead>
-                <span className="sr-only">Details</span>
-              </TableHead> */}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -79,18 +78,12 @@ const ShoppingOrders = () => {
                 <TableCell>
                   {new Date(order.createdAt).toLocaleDateString()}
                 </TableCell>
+                <TableCell>{order.sender}</TableCell>
+                <TableCell>{order.recipientName}</TableCell>
                 <TableCell>{order.status}</TableCell>
                 <TableCell>{order.total} vnd</TableCell>
                 <TableCell>
                   <Dialog open={openDetail} onOpenChange={setOpenDetail}>
-                    {/* <Button
-                      onClick={() => {
-                        setSelectedOrder(order);
-                        setOpenDetail(true);
-                      }}
-                    >
-                      View Details
-                    </Button> */}
                     {selectedOrder && selectedOrder._id === order._id && (
                       <ShoppingOrderDetail
                         setOpenDetail={setOpenDetail}
@@ -103,7 +96,6 @@ const ShoppingOrders = () => {
             ))}
           </TableBody>
         </Table>
-
       </CardContent>
     </Card>
   );

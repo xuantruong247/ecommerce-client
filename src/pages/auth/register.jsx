@@ -9,6 +9,7 @@ const AuthRegister = () => {
   const [password, setPassword] = useState("");
   const [address, setAddress] = useState(""); // Thêm state cho address
   const [phone, setPhone] = useState(""); // Thêm state cho phone
+  const [name, setName] = useState(""); // Thêm state cho name
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
@@ -22,29 +23,25 @@ const AuthRegister = () => {
     setSuccessMessage("");
 
     try {
-      const response = await fetch(
-        "http://localhost:3000/api/v1/auth/register",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            email,
-            password,
-            address, // Gửi address
-            phone, // Gửi phone
-            role: "user", // Role mặc định là "user"
-          }),
-        }
-      );
+      const response = await fetch("http://localhost:3000/api/v1/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          password,
+          address, // Gửi address
+          phone, // Gửi phone
+          name, // Gửi name
+          role: "user", // Role mặc định là "user"
+        }),
+      });
 
       const data = await response.json();
       if (response.ok) {
         console.log("Register successful:", data);
-        setSuccessMessage(
-          "Account created successfully! Redirecting to login..."
-        );
+        setSuccessMessage("Account created successfully! Redirecting to login...");
         setTimeout(() => {
           navigate("/auth/login"); // Chuyển đến trang đăng nhập sau khi đăng ký thành công
         }, 2000);
@@ -61,9 +58,7 @@ const AuthRegister = () => {
   return (
     <div className="mx-auto w-full max-w-md space-y-6">
       <div className="text-center">
-        <h1 className="text-3xl font-bold tracking-tight">
-          Create new account
-        </h1>
+        <h1 className="text-3xl font-bold tracking-tight">Create new account</h1>
         <p className="mt-2">
           Already have an account
           <Link className="font-medium ml-2 hover:underline" to={"/auth/login"}>
@@ -72,6 +67,17 @@ const AuthRegister = () => {
         </p>
       </div>
       <form onSubmit={handleRegister}>
+        <div>
+          <Label htmlFor="name">Name</Label>
+          <Input
+            type="text"
+            name="name"
+            id="name"
+            placeholder="Enter your name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+        </div>
         <div>
           <Label htmlFor="email">Email</Label>
           <Input
