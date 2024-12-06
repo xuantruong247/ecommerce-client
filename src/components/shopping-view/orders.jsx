@@ -67,6 +67,8 @@ const ShoppingOrders = () => {
               <TableHead>Order Date</TableHead>
               <TableHead>Sender</TableHead>
               <TableHead>Recipient</TableHead>
+              <TableHead>Address</TableHead>
+              <TableHead>Phone Number</TableHead>
               <TableHead>Order Status</TableHead>
               <TableHead>Order Price</TableHead>
             </TableRow>
@@ -80,6 +82,8 @@ const ShoppingOrders = () => {
                 </TableCell>
                 <TableCell>{order.sender}</TableCell>
                 <TableCell>{order.recipientName}</TableCell>
+                <TableCell>{order.address}</TableCell>
+                <TableCell>{order.phone}</TableCell>
                 <TableCell>{order.status}</TableCell>
                 <TableCell>{order.total} vnd</TableCell>
                 <TableCell>
