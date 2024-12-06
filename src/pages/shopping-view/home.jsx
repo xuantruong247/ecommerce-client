@@ -6,8 +6,10 @@ import bannerOne from "../../assets/bannerOne.webp";
 import bannerTwo from "../../assets/bannerTwo.jpg";
 import bannerThree from "../../assets/bannerThree.avif";
 import { Card, CardContent } from "../../components/ui/card";
-import ShoppingProductTitle from "../../components/shopping-view/product-tile"; 
-import ShoppingProductDetail from "../../components/shopping-view/product-detail"; 
+import ShoppingProductTitle from "../../components/shopping-view/product-tile";
+import ShoppingProductDetail from "../../components/shopping-view/product-detail";
+import ShoppingFooter from "../../components/shopping-view/footer";
+
 
 const ShoppingHome = () => {
   const navigate = useNavigate();
@@ -16,7 +18,7 @@ const ShoppingHome = () => {
   const [categories, setCategories] = useState([]);
   const [products, setProducts] = useState([]);
   const [searchKeyword, setSearchKeyword] = useState("");
-  const [openDetail, setOpenDetail] = useState(false); 
+  const [openDetail, setOpenDetail] = useState(false);
 
   // Fetch Categories
   useEffect(() => {
@@ -47,7 +49,7 @@ const ShoppingHome = () => {
       const query = new URLSearchParams({
         limit: 12,
         hot: true,
-        ...(searchKeyword && { name: searchKeyword }), 
+        ...(searchKeyword && { name: searchKeyword }),
       }).toString();
 
       const response = await fetch(`http://localhost:3000/api/v1/product?${query}`, {
@@ -75,7 +77,7 @@ const ShoppingHome = () => {
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       fetchProducts();
-    }, 500); 
+    }, 500);
 
     return () => clearTimeout(timeoutId);
   }, [searchKeyword]);
@@ -187,6 +189,7 @@ const ShoppingHome = () => {
           product={products.find((product) => product._id === currentProductId)}
         />
       )}
+      <ShoppingFooter />
     </div>
   );
 };
