@@ -19,6 +19,7 @@ const ShoppingHome = () => {
   const [products, setProducts] = useState([]);
   const [searchKeyword, setSearchKeyword] = useState("");
   const [openDetail, setOpenDetail] = useState(false);
+  const [currentProductId, setCurrentProductId] = useState(null); // Thêm state lưu ID của sản phẩm hiện tại
 
   // Fetch Categories
   useEffect(() => {
@@ -52,7 +53,7 @@ const ShoppingHome = () => {
         ...(searchKeyword && { name: searchKeyword }),
       }).toString();
 
-      const response = await fetch(`http://localhost:3000/api/v1/product?${query}`, {
+      const response = await fetch(`http://localhost:3000/api/v1/product?hot=true?${query}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -94,7 +95,7 @@ const ShoppingHome = () => {
     navigate(`/shop/listing?category=${category}`);
   };
 
-  // Open product detail
+  // Mở chi tiết sản phẩm
   const handleProductDetail = (productId) => {
     setCurrentProductId(productId);
     setOpenDetail(true);
@@ -174,7 +175,7 @@ const ShoppingHome = () => {
               <ShoppingProductTitle
                 key={product._id}
                 product={product}
-                productByDetail={handleProductDetail}
+                productByDetail={() => handleProductDetail(product._id)} // Gọi hàm mở chi tiết sản phẩm
               />
             ))}
           </div>
