@@ -6,8 +6,10 @@ import bannerOne from "../../assets/bannerOne.webp";
 import bannerTwo from "../../assets/bannerTwo.jpg";
 import bannerThree from "../../assets/bannerThree.avif";
 import { Card, CardContent } from "../../components/ui/card";
-import ShoppingProductTitle from "../../components/shopping-view/product-tile"; 
-import ShoppingProductDetail from "../../components/shopping-view/product-detail"; 
+import ShoppingProductTitle from "../../components/shopping-view/product-tile";
+import ShoppingProductDetail from "../../components/shopping-view/product-detail";
+import ShoppingFooter from "../../components/shopping-view/footer";
+
 
 const ShoppingHome = () => {
   const navigate = useNavigate();
@@ -16,7 +18,8 @@ const ShoppingHome = () => {
   const [categories, setCategories] = useState([]);
   const [products, setProducts] = useState([]);
   const [searchKeyword, setSearchKeyword] = useState("");
-  const [openDetail, setOpenDetail] = useState(false); 
+  const [openDetail, setOpenDetail] = useState(false);
+  const [currentProductId, setCurrentProductId] = useState(null); // Thêm state lưu ID của sản phẩm hiện tại
 
   // Fetch Categories
   useEffect(() => {
@@ -47,10 +50,10 @@ const ShoppingHome = () => {
       const query = new URLSearchParams({
         limit: 12,
         hot: true,
-        ...(searchKeyword && { name: searchKeyword }), 
+        ...(searchKeyword && { name: searchKeyword }),
       }).toString();
 
-      const response = await fetch(`http://localhost:3000/api/v1/product?${query}`, {
+      const response = await fetch(`http://localhost:3000/api/v1/product?hot=true?${query}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -75,7 +78,7 @@ const ShoppingHome = () => {
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       fetchProducts();
-    }, 500); 
+    }, 500);
 
     return () => clearTimeout(timeoutId);
   }, [searchKeyword]);
@@ -92,7 +95,7 @@ const ShoppingHome = () => {
     navigate(`/shop/listing?category=${category}`);
   };
 
-  // Open product detail
+  // Mở chi tiết sản phẩm
   const handleProductDetail = (productId) => {
     setCurrentProductId(productId);
     setOpenDetail(true);
@@ -172,7 +175,7 @@ const ShoppingHome = () => {
               <ShoppingProductTitle
                 key={product._id}
                 product={product}
-                productByDetail={handleProductDetail}
+                productByDetail={() => handleProductDetail(product._id)} // Gọi hàm mở chi tiết sản phẩm
               />
             ))}
           </div>
@@ -187,6 +190,7 @@ const ShoppingHome = () => {
           product={products.find((product) => product._id === currentProductId)}
         />
       )}
+      <ShoppingFooter />
     </div>
   );
 };

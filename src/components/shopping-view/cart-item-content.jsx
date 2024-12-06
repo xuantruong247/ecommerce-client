@@ -122,16 +122,10 @@ const UserCartItemsContent = () => {
             <h3 className="font-extrabold">{item.product.name}</h3>
             <div className="flex gap-2 items-center">
               <div className="flex items-center mt-1">
-                <Button variant="outline" className="h-8 w-8" size="icon" onClick={() => handleDecrease(item.product._id)}>
-                  <Minus className="w-4 h-4" />
-                </Button>
+                Quantities: 
               </div>
               <p>{quantities[item.product._id]}</p> {/* Hiển thị số lượng từ state */}
-              <div className="flex items-center mt-1">
-                <Button variant="outline" className="h-8 w-8" size="icon" onClick={() => handleIncrease(item.product._id)}>
-                  <Plus className="w-4 h-4" />
-                </Button>
-              </div>
+             
             </div>
             <div className="flex flex-col items-end">
               <p className="font-semibold">{item.product.price * quantities[item.product._id]} vnd</p> {/* Tính tổng tiền */}
