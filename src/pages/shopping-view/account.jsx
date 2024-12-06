@@ -7,6 +7,7 @@ import {
   TabsTrigger,
 } from "../../components/ui/tabs";
 import ShoppingOrders from "../../components/shopping-view/orders";
+import ShoppingFooter from "../../components/shopping-view/footer";
 
 const ShoppingAccount = () => {
   return (
@@ -33,6 +34,7 @@ const ShoppingAccount = () => {
           </Tabs>
         </div>
       </div>
+      <ShoppingFooter />
     </div>
   );
 };
