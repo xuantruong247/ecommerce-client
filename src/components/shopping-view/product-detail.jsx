@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Dialog, DialogContent } from "../ui/dialog";
 import { Button } from "../ui/button";
 import { Separator } from "../ui/separator";
@@ -7,37 +7,92 @@ import { StarIcon } from "lucide-react";
 import { Input } from "../ui/input";
 
 const ShoppingProductDetail = ({ open, setOpen, product }) => {
-  const handleAddToCart = async () => {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [comments, setComments] = useState([]);
+  const [newComment, setNewComment] = useState(""); 
+
+  useEffect(() => {
+    const fetchComments = async () => {
+      try {
+        const token = localStorage.getItem("accessToken");
+        if (!token) {
+          setError("You need to log in first.");
+          return;
+        }
+
+        const response = await fetch(
+          `http://localhost:3000/api/v1/comment/${product?._id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`, 
+            },
+          }
+        );
+
+        const data = await response.json();
+        if (response.ok) {
+          setComments(data.data?.data || []);
+        } else {
+          setError(data.message || "Failed to fetch comments.");
+        }
+      } catch (error) {
+        console.error("Error fetching comments:", error);
+        setError("An error occurred while fetching comments.");
+      }
+    };
+
+    if (product?._id) {
+      fetchComments();
+    }
+  }, [product?._id]);
+
+  const handleSubmit = async () => {
+    if (!newComment.trim()) {
+      setError("Comment cannot be empty.");
+      return;
+    }
+
     try {
-      // Lấy token từ localStorage
+      setLoading(true);
+      setError(null);
+
       const token = localStorage.getItem("accessToken");
       if (!token) {
-        alert("You need to log in first.");
+        setError("You need to log in first.");
+        setLoading(false);
         return;
       }
 
-      // Gọi API để thêm sản phẩm vào giỏ hàng
       const response = await fetch(
-        `http://localhost:3000/api/v1/order?productID=${product?._id}`,
+        `http://localhost:3000/api/v1/comment/${product?._id}`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`, // Truyền token vào header
+            Authorization: `Bearer ${token}`,
           },
+          body: JSON.stringify({
+            message: newComment, // Gửi message mới
+          }),
         }
       );
 
       const data = await response.json();
       if (response.ok) {
-        alert("Product added to cart successfully!");
+        setComments((prevComments) => [
+          ...prevComments,
+          { message: newComment, userID: "You", _id: Date.now() }, // Thêm bình luận mới vào danh sách
+        ]);
+        setNewComment(""); // Làm sạch trường input
       } else {
-        console.error("Failed to add product to cart:", data.message);
-        alert(data.message || "Failed to add product to cart.");
+        setError(data.message || "Failed to post comment.");
       }
     } catch (error) {
-      console.error("Error adding product to cart:", error);
-      alert("An error occurred. Please try again later.");
+      console.error("Error posting comment:", error);
+      setError("An error occurred while posting the comment.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -77,71 +132,48 @@ const ShoppingProductDetail = ({ open, setOpen, product }) => {
             </div>
             <p className="text-muted">(4.5)</p>
           </div>
-          <Button className="w-full" onClick={handleAddToCart}>
-            Add to cart
+          <Button className="w-full" onClick={handleSubmit} disabled={loading}>
+            {loading ? "Submitting..." : "Submit"}
           </Button>
+          {error && <p className="text-red-500 mt-2">{error}</p>}
           <Separator />
           <div className="max-h-[300px] overflow-auto">
             <h2 className="text-xl font-bold mb-4">Reviews</h2>
             <div className="grid gap-6">
-              <div className="flex gap-4">
-                <Avatar className="h-10 w-10 border">
-                  <AvatarFallback>TN</AvatarFallback>
-                </Avatar>
-                <div className="grid gap-1">
-                  <div className="flex items-center gap-2">
-                    <h3 className="font-bold">Nguyen Xuan Truong</h3>
+              {comments.length > 0 ? (
+                comments.map((comment) => (
+                  <div key={comment._id} className="flex gap-4">
+                    <Avatar className="h-10 w-10 border">
+                      <AvatarFallback>{comment.userID.charAt(0).toUpperCase()}</AvatarFallback>
+                    </Avatar>
+                    <div className="grid gap-1">
+                      <div className="flex items-center gap-2">
+                        <h3 className="font-bold">{comment.userID}</h3>
+                      </div>
+                      <div className="flex items-center gap-0.5">
+                        <StarIcon className="w-5 h-5 fill-yellow-400" />
+                        <StarIcon className="w-5 h-5 fill-yellow-400" />
+                        <StarIcon className="w-5 h-5 fill-yellow-400" />
+                        <StarIcon className="w-5 h-5 fill-yellow-400" />
+                        <StarIcon className="w-5 h-5 fill-yellow-400" />
+                      </div>
+                      <p className="text-muted">{comment.message}</p>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-0.5">
-                    <StarIcon className="w-5 h-5 fill-yellow-400" />
-                    <StarIcon className="w-5 h-5 fill-yellow-400" />
-                    <StarIcon className="w-5 h-5 fill-yellow-400" />
-                    <StarIcon className="w-5 h-5 fill-yellow-400" />
-                    <StarIcon className="w-5 h-5 fill-yellow-400" />
-                  </div>
-                  <p className="text-muted">This is an awesome product</p>
-                </div>
-              </div>
-              <div className="flex gap-4">
-                <Avatar className="h-10 w-10 border">
-                  <AvatarFallback>TN</AvatarFallback>
-                </Avatar>
-                <div className="grid gap-1">
-                  <div className="flex items-center gap-2">
-                    <h3 className="font-bold">Nguyen Xuan Truong</h3>
-                  </div>
-                  <div className="flex items-center gap-0.5">
-                    <StarIcon className="w-5 h-5 fill-yellow-400" />
-                    <StarIcon className="w-5 h-5 fill-yellow-400" />
-                    <StarIcon className="w-5 h-5 fill-yellow-400" />
-                    <StarIcon className="w-5 h-5 fill-yellow-400" />
-                    <StarIcon className="w-5 h-5 fill-yellow-400" />
-                  </div>
-                  <p className="text-muted">This is an awesome product</p>
-                </div>
-              </div>
-              <div className="flex gap-4">
-                <Avatar className="h-10 w-10 border">
-                  <AvatarFallback>TN</AvatarFallback>
-                </Avatar>
-                <div className="grid gap-1">
-                  <div className="flex items-center gap-2">
-                    <h3 className="font-bold">Nguyen Xuan Truong</h3>
-                  </div>
-                  <div className="flex items-center gap-0.5">
-                    <StarIcon className="w-5 h-5 fill-yellow-400" />
-                    <StarIcon className="w-5 h-5 fill-yellow-400" />
-                    <StarIcon className="w-5 h-5 fill-yellow-400" />
-                    <StarIcon className="w-5 h-5 fill-yellow-400" />
-                    <StarIcon className="w-5 h-5 fill-yellow-400" />
-                  </div>
-                  <p className="text-muted">This is an awesome product</p>
-                </div>
-              </div>
+                ))
+              ) : (
+                <p>No reviews yet.</p>
+              )}
             </div>
             <div className="mt-6 flex gap-2">
-              <Input placeholder="Write a review..." />
-              <Button>Submit</Button>
+              <Input
+                placeholder="Write a review..."
+                value={newComment}
+                onChange={(e) => setNewComment(e.target.value)} // Cập nhật nội dung bình luận
+              />
+              <Button onClick={handleSubmit} disabled={loading}>
+                Submit
+              </Button>
             </div>
           </div>
         </div>

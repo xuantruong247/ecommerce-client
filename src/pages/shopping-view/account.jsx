@@ -6,8 +6,8 @@ import {
   TabsList,
   TabsTrigger,
 } from "../../components/ui/tabs";
-import Address from "../../components/shopping-view/address";
 import ShoppingOrders from "../../components/shopping-view/orders";
+import ShoppingFooter from "../../components/shopping-view/footer";
 
 const ShoppingAccount = () => {
   return (
@@ -26,17 +26,15 @@ const ShoppingAccount = () => {
           <Tabs defaultValue="orders">
             <TabsList>
               <TabsTrigger value="orders">Orders</TabsTrigger>
-              <TabsTrigger value="address">Address</TabsTrigger>
             </TabsList>
             <TabsContent value="orders">
               <ShoppingOrders />
             </TabsContent>
-            <TabsContent value="address">
-              <Address />
-            </TabsContent>
+           
           </Tabs>
         </div>
       </div>
+      <ShoppingFooter />
     </div>
   );
 };
