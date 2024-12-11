@@ -39,7 +39,7 @@ const AdminProducts = () => {
   const handlePriceChange = (event) => {
     const value = event.target.value;
     if (!isNaN(value) && value >= 0) {
-      setPrice(Number(value))
+      setPrice(Number(value));
     }
   };
 
@@ -81,13 +81,13 @@ const AdminProducts = () => {
     e.preventDefault();
 
     if (!productName || !description || !selectedCategory || !selectedFile || !price) {
-      console.error("Please fill in all fields.");
+      alert("Please fill in all required fields.");
       return;
     }
 
     const imageUrl = await uploadImage(selectedFile);
     if (!imageUrl) {
-      console.error("Image upload failed.");
+      alert("Image upload failed.");
       return;
     }
 
@@ -96,7 +96,7 @@ const AdminProducts = () => {
       category: selectedCategory,
       description,
       img: imageUrl,
-      price:Number(price)
+      price: Number(price),
     };
 
     const accessToken = localStorage.getItem("accessToken");
@@ -114,8 +114,7 @@ const AdminProducts = () => {
       const data = await response.json();
       if (response.ok) {
         console.log("Product created successfully:", data);
-        setOpenCreateProductDialog(false); // Đóng dialog sau khi thêm thành công
-        // Reset form
+        setOpenCreateProductDialog(false);
         setProductName("");
         setDescription("");
         setSelectedCategory("");
@@ -136,8 +135,8 @@ const AdminProducts = () => {
           Add new product
         </Button>
       </div>
-      <div >
-        <AdminProductTitle/>
+      <div>
+        <AdminProductTitle />
         <Sheet
           open={openCreateProductDialog}
           onOpenChange={setOpenCreateProductDialog}
@@ -154,6 +153,7 @@ const AdminProducts = () => {
                     placeholder="Enter your product name"
                     value={productName}
                     onChange={(e) => setProductName(e.target.value)}
+                    required
                   />
                 </div>
                 <div>
@@ -162,6 +162,7 @@ const AdminProducts = () => {
                     placeholder="Enter your product description"
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
+                    required
                   />
                 </div>
                 <div>
@@ -171,6 +172,7 @@ const AdminProducts = () => {
                     value={selectedCategory}
                     onChange={(e) => setSelectedCategory(e.target.value)}
                     className="w-full border p-2 rounded"
+                    required
                   >
                     <option value="">Select a category</option>
                     {categories.map((category) => (
@@ -190,6 +192,7 @@ const AdminProducts = () => {
                     placeholder="Enter your price"
                     className="w-full border p-2 rounded"
                     min="0"
+                    required
                   />
                 </div>
                 <div>
@@ -199,6 +202,7 @@ const AdminProducts = () => {
                     id="file"
                     onChange={handleFileChange}
                     className="w-full border p-2 rounded"
+                    required
                   />
                 </div>
                 <div className="flex items-center justify-center mt-5">
