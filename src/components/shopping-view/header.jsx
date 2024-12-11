@@ -25,9 +25,14 @@ const ShoppingHeader = () => {
   const [categories, setCategories] = useState([]); // State to store categories
   const [openMenu, setOpenMenu] = useState(false); // For mobile menu
   const [openCartSheet, setOpenCartSheet] = useState(false); // For cart
+  const [isLoggedIn, setIsLoggedIn] = useState(false); // Check login status
   const navigate = useNavigate();
 
-  const users = true; // Replace this with actual user state logic
+  // Check localStorage for accessToken
+  useEffect(() => {
+    const accessToken = localStorage.getItem("accessToken");
+    setIsLoggedIn(!!accessToken);
+  }, []);
 
   // Fetch categories from API
   useEffect(() => {
@@ -47,9 +52,10 @@ const ShoppingHeader = () => {
 
   // Logout function
   const onLogout = () => {
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
-    navigate('/auth/login');  // Navigate to login page after logout
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
+    setIsLoggedIn(false);
+    navigate("/auth/login"); // Navigate to login page after logout
   };
 
   return (
@@ -81,14 +87,14 @@ const ShoppingHeader = () => {
                   {category.name}
                 </Link>
               ))}
-              {users ? (
+              {isLoggedIn ? (
                 <UserActions
                   onCartOpen={() => setOpenCartSheet(true)}
-                  onLogout={onLogout}  // Pass onLogout here
+                  onLogout={onLogout}
                   navigate={navigate}
                 />
               ) : (
-                <GuestLogin />
+                <GuestLogin navigate={navigate} />
               )}
             </nav>
           </SheetContent>
@@ -108,14 +114,14 @@ const ShoppingHeader = () => {
               {category.name}
             </Link>
           ))}
-          {users ? (
+          {isLoggedIn ? (
             <UserActions
               onCartOpen={() => setOpenCartSheet(true)}
-              onLogout={onLogout}  // Pass onLogout here
+              onLogout={onLogout}
               navigate={navigate}
             />
           ) : (
-            <GuestLogin />
+            <GuestLogin navigate={navigate} />
           )}
         </div>
 
@@ -150,7 +156,7 @@ const UserActions = ({ onCartOpen, onLogout, navigate }) => (
           Account
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={onLogout}>  {/* Call onLogout */}
+        <DropdownMenuItem onClick={onLogout}>
           <LogOut className="mr-2 h-4 w-4" />
           Logout
         </DropdownMenuItem>
@@ -159,9 +165,11 @@ const UserActions = ({ onCartOpen, onLogout, navigate }) => (
   </div>
 );
 
-// Component for guest login
-const GuestLogin = () => (
-  <span className="bg-muted/30 hover:bg-muted/40 font-bold text-sm rounded-full h-10 w-20 items-center justify-center flex gap-1 cursor-pointer">
+const GuestLogin = ({ navigate }) => (
+  <span
+    onClick={() => navigate("/auth/login")}
+    className="bg-muted/30 hover:bg-muted/40 font-bold text-sm rounded-full h-10 w-20 items-center justify-center flex gap-1 cursor-pointer"
+  >
     <LogInIcon size={17} />
     <span>Login</span>
   </span>
